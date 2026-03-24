@@ -1,0 +1,177 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: Build type
+        required: true
+        default: release
+        type: choice
+        options:
+          - debug
+          - release
+
+env:
+  JAVA_VERSION: 17
+  ANDROID_SDK_VERSION: 33
+  ANDROID_NDK_VERSION: 25.2.9519653
+  GRADLE_VERSION: 8.0
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      BUILD_TYPE: ${{ github.event.inputs.build_type || 'release' }}
+    
+    permissions:
+      contents: read
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: gradle
+          
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install buildozer cython
+          
+      - name: Create Buildozer cache directory
+        run: mkdir -p ~/.buildozer/android/sdk/platforms ~/.buildozer/android/ndk
+        
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+        with:
+          api-level: ${{ env.ANDROID_SDK_VERSION }}
+          
+      - name: Setup NDK
+        run: |
+          sdkmanager "ndk;${{ env.ANDROID_NDK_VERSION }}"
+          
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: ${{ env.GRADLE_VERSION }}
+          
+      - name: Install build requirements
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            libffi-dev \
+            libssl-dev \
+            libxml2-dev \
+            libxslt1-dev \
+            zlib1g-dev \
+            libjpeg-dev \
+            libfreetype6-dev \
+            libtiff-dev \
+            libopenjp2-7-dev \
+            libwebp-dev \
+            libltdl-dev \
+            libsdl2-dev \
+            libsdl2-image-dev \
+            libsdl2-mixer-dev \
+            libsdl2-ttf-dev \
+            curl \
+            git \
+            zip \
+            unzip
+            
+      - name: Build APK with Buildozer
+        run: |
+          buildozer -v android $BUILD_TYPE
+            
+      - name: Upload APK
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: mediadownloader-${{ env.BUILD_TYPE }}-apk
+          path: bin/*.apk
+          retention-days: 30
+          
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: bin/mediadownloader-*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Notify on Failure
+        if: failure()
+        run: |
+          echo "Build failed! Check the logs for details."
+          exit 1
+
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Install linters
+        run: |
+          pip install flake8 pylint black
+          
+      - name: Run flake8
+        run: flake8 src/ main.py --count --show-source --statistics
+        continue-on-error: true
+        
+      - name: Run black check
+        run: black --check src/ main.py
+        continue-on-error: true
+        
+      - name: Run pylint
+        run: pylint src/ main.py --disable=all --enable=E
+        continue-on-error: true
+
+  security:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Install security tools
+        run: |
+          pip install bandit safety
+          
+      - name: Run bandit
+        run: bandit -r src/ main.py -f json -o bandit-report.json
+        continue-on-error: true
+        
+      - name: Check dependencies
+        run: safety check --json
+        continue-on-error: true

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+    Android FileProvider 配置文件
+
+    用于安全地共享文件给其他应用（Android 7.0+）
+    
+    使用方式：
+    - FileProvider基于路径配置定义了哪些目录中的文件可以被其他应用访问
+    - 防止直接通过file://URI暴露应用私有文件
+    - 支持临时访问授权（FLAG_GRANT_READ_URI_PERMISSION）
+-->
+<paths>
+    <!-- 外部存储 - 应用专属目录 -->
+    <!-- 对应Context.getExternalFilesDir(null) -->
+    <external-files-path
+        name="external_files"
+        path="." />
+
+    <!-- 外部存储 - 下载目录 -->
+    <external-files-path
+        name="downloads"
+        path="Download" />
+
+    <!-- 外部存储 - 媒体目录 -->
+    <external-files-path
+        name="media"
+        path="." />
+
+    <!-- 缓存目录 -->
+    <!-- 对应Context.getExternalCacheDir() -->
+    <external-cache-path
+        name="external_cache"
+        path="." />
+
+    <!-- 应用私有存储 -->
+    <!-- 对应Context.getFilesDir() -->
+    <files-path
+        name="private_files"
+        path="." />
+
+    <!-- 缓存文件 -->
+    <!-- 对应Context.getCacheDir() -->
+    <cache-path
+        name="cache_files"
+        path="." />
+
+    <!-- 公共存储（Android 10+） -->
+    <!-- 注意：需要 MANAGE_EXTERNAL_STORAGE 权限 -->
+    <external-path
+        name="public_downloads"
+        path="Download/MediaDownloader" />
+
+</paths>

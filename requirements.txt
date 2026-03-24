@@ -1,0 +1,35 @@
+# MediaDownloader Android APK Dependencies
+# 用于Kivy应用的Python依赖
+
+# Kivy框架
+kivy==2.3.0
+Kivy-Garden==0.1.5
+
+# 媒体下载
+yt-dlp==2024.1.1
+
+# 媒体处理和转换
+ffmpeg-python==0.2.1
+
+# 媒体播放
+ffpyplayer==4.5.1
+
+# Android集成（pyjnius）
+pyjnius==1.6.1
+
+# 网络和HTTP
+requests==2.31.0
+urllib3==2.1.0
+
+# JSON和数据处理
+python-dateutil==2.8.2
+
+# 日志和调试
+colorama==0.4.6
+
+# 线程和异步
+six==1.16.0
+
+# Android权限和功能（Kivy Android）
+# 注意：这通常通过buildozer自动处理
+# android==0.1.0
