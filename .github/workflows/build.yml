@@ -85,7 +85,7 @@ jobs:
             
       - name: Build APK with Buildozer
         run: |
-          buildozer -v android $BUILD_TYPE
+          yes | buildozer -v android $BUILD_TYPE
             
       - name: Upload APK
         if: success()
