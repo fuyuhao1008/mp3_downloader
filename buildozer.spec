@@ -54,15 +54,7 @@ android.orientation = portrait,sensorportrait
 android.presplash_inside_package = 1
 android.logcat_filters = *:S python:D
 
-# 清单额外配置
-android.manifest_additions = 
-	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-	<uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
-	<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-
-# FileProvider配置用于文件分享
+# 清单额外配置（FileProvider用于文件分享）
 android.manifest_additions = 
 	<provider
 	    android:name="androidx.core.content.FileProvider"
