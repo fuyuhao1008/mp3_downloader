@@ -85,7 +85,11 @@ jobs:
             
       - name: Build APK with Buildozer
         run: |
+          set +o pipefail
           yes | buildozer -v android $BUILD_TYPE
+          buildozer_status=${PIPESTATUS[1]}
+          set -o pipefail
+          exit $buildozer_status
             
       - name: Upload APK
         if: success()
