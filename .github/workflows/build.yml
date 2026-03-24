@@ -56,16 +56,7 @@ jobs:
           pip install buildozer cython
           
       - name: Create Buildozer cache directory
-        run: mkdir -p ~/.buildozer/android/sdk/platforms ~/.buildozer/android/ndk
-        
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v2
-        with:
-          api-level: ${{ env.ANDROID_SDK_VERSION }}
-          
-      - name: Setup NDK
-        run: |
-          sdkmanager "ndk;${{ env.ANDROID_NDK_VERSION }}"
+        run: mkdir -p ~/.buildozer
           
       - name: Install build requirements
         run: |
