@@ -67,11 +67,6 @@ jobs:
         run: |
           sdkmanager "ndk;${{ env.ANDROID_NDK_VERSION }}"
           
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: ${{ env.GRADLE_VERSION }}
-          
       - name: Install build requirements
         run: |
           sudo apt-get update
